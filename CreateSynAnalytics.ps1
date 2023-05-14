@@ -1,5 +1,5 @@
 # Part 1: preparation
-$BaseResourceName = "rameshandme"
+$BaseResourceName = "pickaname"
 $random = $(Get-Random)
 $ResourceGroupName = $BaseResourceName + "rg" + $random
 $SynapseWorkspaceName = $BaseResourceName + "ws" + $random
