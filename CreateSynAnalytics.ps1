@@ -1,4 +1,4 @@
-# Deel 1: voorbereiding
+# Part 1: preparation
 $BaseResourceName = "rameshandme"
 $random = $(Get-Random)
 $ResourceGroupName = $BaseResourceName + "rg" + $random
@@ -9,16 +9,16 @@ $Location = "West Europe"
 
 Connect-AzAccount
 
-# Nieuwe resourcegroup maken
+# Create new resourcegroup
 New-AzResourceGroup -Name $ResourceGroupName -Location $Location
 
-# Door het script als volgt te runnen: ./1.CreateSynAnalytics.ps1 adminusername password worden de waardes meegegeven aan dit script.
+# By running the script as follows: ./1.CreateSynAnalytics.ps1 adminusername password those two values are passed along with the script.
 $SqlUser = $args[0]
 $SqlPassword = $args[1]
 $Cred = New-Object -TypeName System.Management.Automation.PSCredential ($SqlUser, (ConvertTo-SecureString $SqlPassword -AsPlainText -Force))
 
 Write-Output $SqlPassword
-#Deel 2: Data Lake aanmaken
+# Part 2: Create Azure Data Lake
 $StorageAccountParams = @{
   ResourceGroupName = $ResourceGroupName
   Name = $StorageAccountName
@@ -33,9 +33,9 @@ New-AzStorageAccount @StorageAccountParams
 
 $azStorageAccount = Get-AzStorageAccount -ResourceGroupName $ResourceGroupName -Name $StorageAccountName
 if ($null -eq $azStorageAccount) {
-  Write-Output "Het data lake van deel 2 is niet goed aangemaakt of is niet bereikbaar."  
+  Write-Output "The Data Lake in Part 2 was not created correctly or cannot be reached from your side."  
 }
-# Deel 3: Workspace aanmaken
+# Part 3: Create Workspace
 $WorkspaceParams = @{
   Name = $SynapseWorkspaceName
   ResourceGroupName = $ResourceGroupName
@@ -46,7 +46,7 @@ $WorkspaceParams = @{
 }
 New-AzSynapseWorkspace @WorkspaceParams
 
-# Deel 3: toegang tot workspace
+# Access workspace
 $ClientIP = (Invoke-WebRequest ifconfig.me/ip).Content.Trim() 
 
 $FirewallParams = @{
@@ -63,6 +63,6 @@ $SubscriptionId = (Get-AzContext).Subscription.id
 New-AzRoleAssignment -ObjectId (Get-AzADServicePrincipal -SearchString $SynapseWorkspaceName) `
 -RoleDefinitionName "Storage Blob Data Contributor" -Scope "/subscriptions/$SubscriptionId/resourceGroups/$ResourceGroupName/providers/Microsoft.Storage/storageAccounts/$StorageAccountName"
 
-# Test of alles naar wens is.
+# Test if it works properly (Mozilla Firefox is recommended for this app)
 $WorkspaceWeb = (Get-AzSynapseWorkspace -Name $SynapseWorkspaceName -ResourceGroupName $ResourceGroupName).ConnectivityEndpoints.web
 Start-Process $WorkspaceWeb
